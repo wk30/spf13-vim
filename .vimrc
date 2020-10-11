@@ -131,6 +131,13 @@
     set iskeyword-=.                    " '.' is an end of word designator
     set iskeyword-=#                    " '#' is an end of word designator
     set iskeyword-=-                    " '-' is an end of word designator
+    set errorbells                      " Trigger bell on error
+    set nobackup
+
+    if has('vim_starting')
+        set encoding=utf-8
+        scriptencoding utf-8
+    endif
 
     " Instead of reverting the cursor to the last position in the buffer, we
     " set it to the first line when editing a git commit message
@@ -178,11 +185,14 @@
 " Vim UI {
 
     if !exists('g:override_spf13_bundles') && filereadable(expand("~/.vim/bundle/vim-colors-solarized/colors/solarized.vim"))
-        let g:solarized_termcolors=256
+        colorscheme solarized
+        let g:solarized_termcolors="24bits"
         let g:solarized_termtrans=1
-        let g:solarized_contrast="normal"
+        let g:solarized_degrade=0
+        let g:solarized_bold=0
+        let g:solarized_contrast="high"
         let g:solarized_visibility="normal"
-        color solarized             " Load a colorscheme
+        syntax enable
     endif
 
     set tabpagemax=15               " Only show 15 tabs
@@ -457,10 +467,23 @@
 " }
 
 " Plugins {
+    " EditorConfig
+        if isdirectory(expand("~/.vim/bundle/editorconfig-vim"))
+            let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*'] "Excluded patterns.
+            "let g:EditorConfig_disable_rules = ['trim_trailing_whitespace'] "Disable rules
+        endif
 
     " GoLang {
         if count(g:spf13_bundle_groups, 'go')
+            let g:go_highlight_extra_types = 1
+            let g:go_highlight_operators = 0
             let g:go_highlight_functions = 1
+            let g:go_highlight_function_parameters = 1
+            let g:go_highlight_function_calls = 1
+            let g:go_highlight_types = 1
+            let g:go_highlight_fields = 1
+            let g:go_highlight_variable_declarations = 1
+            let g:go_highlight_variable_assignments = 1
             let g:go_highlight_methods = 1
             let g:go_highlight_structs = 1
             let g:go_highlight_operators = 1
@@ -1120,7 +1143,7 @@
             let directory = common_dir . dirname . '/'
             if exists("*mkdir")
                 if !isdirectory(directory)
-                    call mkdir(directory)
+                    call mkdir(directory, 'p')
                 endif
             endif
             if !isdirectory(directory)
